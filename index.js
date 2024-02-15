@@ -7,7 +7,16 @@ const port = process.env.PORT || 5000;
 require("dotenv").config();
 const { MongoClient, ServerApiVersion, Db } = require("mongodb");
 
-app.use(cors());
+app.use(
+  cors({
+    credentials: true,
+    origin: [
+      "https://myshop-606ef.firebaseapp.com",
+      "https://myshop-606ef.web.app",
+      "http://localhost:5173",
+    ],
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -61,7 +70,7 @@ async function run() {
       console.log(payload);
 
       const token = jwt.sign(payload, process.env.ACCESS_SECRET_TOKEN, {
-        expiresIn: "72h",
+        expiresIn: "7d",
       });
       res.send({ token });
     });
@@ -84,7 +93,22 @@ async function run() {
       res.send(result);
     });
 
+
     //!userOperations
+    
+
+    //! product post & get operation
+
+    app.post("/products", async (req, res) => {
+      const product = req.body;
+      const result = await productsCollection.insertOne(product);
+      res.send(result);
+    });
+
+    app.get("/products", async (req, res) => {
+      const result = await productsCollection.find.toArray();
+      res.send(result);
+    });
 
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
