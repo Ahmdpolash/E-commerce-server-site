@@ -95,7 +95,7 @@ async function run() {
 
 
     //!userOperations
-    
+
 
     //! product post & get operation
 
@@ -106,7 +106,7 @@ async function run() {
     });
 
     app.get("/products", async (req, res) => {
-      const result = await productsCollection.find.toArray();
+      const result = await productsCollection.find().toArray();
       res.send(result);
     });
 
