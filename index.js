@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const port = process.env.PORT || 5000;
 require("dotenv").config();
-const { MongoClient, ServerApiVersion, Db } = require("mongodb");
+const { MongoClient, ServerApiVersion, Db, ObjectId } = require("mongodb");
 
 app.use(
   cors({
@@ -33,31 +33,36 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    //==================================Collection======================================//
+
     //? All collection
     const userCollection = client.db("MyShop").collection("users");
     const productsCollection = client.db("MyShop").collection("products");
     const cartCollection = client.db("MyShop").collection("carts");
     const compareCollection = client.db("MyShop").collection("compares");
     const favoriteCollection = client.db("MyShop").collection("favorites");
+    const bannersCollection = client.db("MyShop").collection("banners");
+    const categoryCollection = client.db("MyShop").collection("categories");
 
     //!jwt related api
 
     //!middleware
-    // const verifyToken = (req, res, next) => {
-    //   console.log("inside the bearer token", req.headers);
-    //   if (!req.token.authorization) {
-    //     return res.status(401).send({ message: "forbidden access" });
-    //   }
+    const verifyToken = (req, res, next) => {
+      console.log("inside the bearer token", req.headers);
+      if (!req.token.authorization) {
+        return res.status(401).send({ message: "forbidden access" });
+      }
 
-    //   const token = req.headers.authorization.split(" ")[1];
-    //   jwt.verify(token, process.env.ACCESS_SECRET_TOKEN, (err, decoded) => {
-    //     if (err) {
-    //       return res.status(401).send({ message: "forbidden access" });
-    //     }
-    //     req.decoded = decoded;
-    //     next();
-    //   });
-    // };
+      const token = req.headers.authorization.split(" ")[1];
+      jwt.verify(token, process.env.ACCESS_SECRET_TOKEN, (err, decoded) => {
+        if (err) {
+          return res.status(401).send({ message: "forbidden access" });
+        }
+        req.decoded = decoded;
+        next();
+      });
+    };
+
     app.post("/jwt", async (req, res) => {
       const user = req.body;
       const userRole = await userCollection.findOne({ email: user.email });
@@ -74,6 +79,8 @@ async function run() {
       });
       res.send({ token });
     });
+
+    //============================================================================//
 
     //!userOperations
 
@@ -93,9 +100,9 @@ async function run() {
       res.send(result);
     });
 
+    //!userOperations\\
 
-    //!userOperations
-
+    //============================================================================//
 
     //! product post & get operation
 
@@ -110,6 +117,41 @@ async function run() {
       res.send(result);
     });
 
+    //============================================================================//
+
+    //!  categories all operations
+    app.post("/categories", async (req, res) => {
+      const category = req.body;
+      const result = await categoryCollection.insertOne(category);
+      res.send(result);
+    });
+
+    app.get("/categories", async (req, res) => {
+      const result = await categoryCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.delete("/categories/delete/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await categoryCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    // app.patch("/categories/:id", async (req, res) => {
+    //   const id = req.params.id;
+    //   const query = { _id: new ObjectId(id) };
+    //   const update = {
+    //     $set:{
+
+    //     }
+    //   }
+    //   const result = await categoryCollection.deleteOne(query);
+    //   res.send(result);
+    // });
+
+    //============================================================================//
+
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
@@ -119,7 +161,7 @@ async function run() {
 }
 run().catch(console.dir);
 
-app.get("/", (req, res) => {
+app.get("/health", (req, res) => {
   res.send("E-commerce website running");
 });
 
