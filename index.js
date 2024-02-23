@@ -138,17 +138,27 @@ async function run() {
       res.send(result);
     });
 
-    // app.patch("/categories/:id", async (req, res) => {
-    //   const id = req.params.id;
-    //   const query = { _id: new ObjectId(id) };
-    //   const update = {
-    //     $set:{
+    app.put("/categories/update/:id", async (req, res) => {
+      const id = req.params.id;
+      const categories = req.body;
+      const query = { _id: new ObjectId(id) };
 
-    //     }
-    //   }
-    //   const result = await categoryCollection.deleteOne(query);
-    //   res.send(result);
-    // });
+      const update = {
+        $set: {
+          category: categories.category,
+        },
+      };
+      const result = await categoryCollection.updateOne(query, update);
+      res.send(result);
+    });
+
+    app.get("/category/single/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      console.log(query);
+      const result = await categoryCollection.findOne(query);
+      res.send(result);
+    });
 
     //============================================================================//
 
