@@ -95,10 +95,64 @@ async function run() {
       res.send(result);
     });
 
+    //get all users
     app.get("/users", async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
+
+    //get role by api data from database just fetch like localhost:5000/users/${seller}
+
+    app.get("/users/:role", async (req, res) => {
+      const role = req.params.role;
+      const query = { role: role };
+      const result = await userCollection.find(query).toArray();
+
+      res.send(result);
+    });
+
+    //status by query
+    app.get("/sellers/pending/:status", async (req, res) => {
+      const status = req.params.status;
+      const query = { status: status };
+      const result = await userCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //? approve and deactivate seller
+
+    app.put("/seller/status/:id", async (req, res) => {
+      const id = req.params.id;
+      const action = req.body;
+      const query = { _id: new ObjectId(id) };
+      const update = {
+        $set: {
+          status: action.status,
+        },
+      };
+
+      const result = await userCollection.updateOne(query, update);
+      res.send(result);
+    });
+
+    // app.get("/users", async (req, res) => {
+    //   const { role, email } = req.query; // Assuming you pass role and/or email as query parameters
+
+    //   let query = { role: "seller" }; // Initial query to find sellers
+
+    //   if (email) {
+    //     query.email = email; // If email is provided, include it in the query
+    //   }
+
+    //   try {
+    //     const result = await userCollection.find(query).toArray();
+    //     console.log(result);
+    //     res.send(result);
+    //   } catch (error) {
+    //     console.error("Error retrieving users:", error);
+    //     res.status(500).send("Internal Server Error");
+    //   }
+    // });
 
     //!userOperations\\
 
