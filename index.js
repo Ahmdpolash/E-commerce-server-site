@@ -135,30 +135,7 @@ async function run() {
       res.send(result);
     });
 
-    // app.get("/users", async (req, res) => {
-    //   const { role, email } = req.query; // Assuming you pass role and/or email as query parameters
-
-    //   let query = { role: "seller" }; // Initial query to find sellers
-
-    //   if (email) {
-    //     query.email = email; // If email is provided, include it in the query
-    //   }
-
-    //   try {
-    //     const result = await userCollection.find(query).toArray();
-    //     console.log(result);
-    //     res.send(result);
-    //   } catch (error) {
-    //     console.error("Error retrieving users:", error);
-    //     res.status(500).send("Internal Server Error");
-    //   }
-    // });
-
-    //!userOperations\\
-
-    //============================================================================//
-
-    //! product post & get operation
+    //! product post and get api ===========================
 
     app.post("/products", async (req, res) => {
       const product = req.body;
@@ -171,9 +148,17 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/products/seller/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await productsCollection.find(query).toArray();
+      res.send(result);
+    });
+
     //============================================================================//
 
     //!  categories all operations
+
     app.post("/categories", async (req, res) => {
       const category = req.body;
       const result = await categoryCollection.insertOne(category);
@@ -215,6 +200,19 @@ async function run() {
     });
 
     //============================================================================//
+
+    //!Banner ==========
+
+    app.post("/banners", async (req, res) => {
+      const category = req.body;
+      const result = await bannersCollection.insertOne(category);
+      res.send(result);
+    });
+
+    app.get("/banners", async (req, res) => {
+      const result = await bannersCollection.find().toArray();
+      res.send(result);
+    });
 
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
