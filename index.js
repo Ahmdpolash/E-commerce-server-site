@@ -72,8 +72,6 @@ async function run() {
       const { role } = userRole;
       const payload = { user, role };
 
-      console.log(payload);
-
       const token = jwt.sign(payload, process.env.ACCESS_SECRET_TOKEN, {
         expiresIn: "7d",
       });
@@ -148,6 +146,13 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/products/details/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productsCollection.findOne(query);
+      res.send(result);
+    });
+
     app.get("/products/seller/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
@@ -194,7 +199,6 @@ async function run() {
     app.get("/category/single/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      console.log(query);
       const result = await categoryCollection.findOne(query);
       res.send(result);
     });
