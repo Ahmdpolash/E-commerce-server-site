@@ -40,7 +40,7 @@ async function run() {
     const productsCollection = client.db("MyShop").collection("products");
     const cartCollection = client.db("MyShop").collection("carts");
     const compareCollection = client.db("MyShop").collection("compares");
-    const favoriteCollection = client.db("MyShop").collection("favorites");
+    const wishlistCollection = client.db("MyShop").collection("wishlists");
     const bannersCollection = client.db("MyShop").collection("banners");
     const categoryCollection = client.db("MyShop").collection("categories");
 
@@ -133,6 +133,8 @@ async function run() {
       res.send(result);
     });
 
+    //================================================================
+
     //! product post and get api ===========================
 
     app.post("/products", async (req, res) => {
@@ -157,6 +159,59 @@ async function run() {
       const email = req.params.email;
       const query = { email: email };
       const result = await productsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //================================================================
+
+    //!=================================add to cart =======================
+
+    app.post("/carts", async (req, res) => {
+      const product = req.body;
+      const query = { productId: product.productId, email: product.email };
+      const existingProduct = await cartCollection.findOne(query);
+      if (existingProduct) {
+        return res.send({ message: "Product already added", insertedId: null });
+      }
+      const result = await cartCollection.insertOne(product);
+      res.send(result);
+    });
+
+    app.get("/carts", async (req, res) => {
+      const result = await cartCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/carts/items", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const result = await cartCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //============================================================================//
+    //!=================================add to wishlist =======================
+
+    app.post("/wishlists", async (req, res) => {
+      const product = req.body;
+      const query = { productId: product.productId, email: product.email };
+      const existingProduct = await wishlistCollection.findOne(query);
+      if (existingProduct) {
+        return res.send({ message: "Product already added", insertedId: null });
+      }
+      const result = await wishlistCollection.insertOne(product);
+      res.send(result);
+    });
+r
+    app.get("/wishlists", async (req, res) => {
+      const result = await wishlistCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/wishlists/items", async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const result = await wishlistCollection.find(query).toArray();
       res.send(result);
     });
 
