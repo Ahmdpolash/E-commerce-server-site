@@ -143,11 +143,34 @@ async function run() {
       res.send(result);
     });
 
+    //get only discount product
+
+    // app.get("/product/:discount", async (req, res) => {
+    //   const discount = req.params.discount;
+    //   const query = { discount: discount };
+    //   console.log(query);
+    //   const result = await productsCollection.find(query).toArray();
+    //   res.send(result);
+    // });
+
+    //get all products
+
     app.get("/products", async (req, res) => {
       const result = await productsCollection.find().toArray();
       res.send(result);
     });
 
+    //get single product
+
+    app.get("/products/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+
+      const result = await productsCollection.findOne(query);
+      res.send(result);
+    });
+
+    //details page product
     app.get("/products/details/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -155,10 +178,59 @@ async function run() {
       res.send(result);
     });
 
+    //get product by email
+
     app.get("/products/seller/:email", async (req, res) => {
       const email = req.params.email;
       const query = { email: email };
       const result = await productsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //product delete seller dashboard
+
+    app.delete("/product/delete/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await productsCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    //update product all data
+    app.patch("/product/update/:id", async (req, res) => {
+      const product = req.body;
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          product_name: product.product_name,
+          brand: product.brand,
+          category: product.category,
+          stock: product.stock,
+          price: product.price,
+          discount: product.discount,
+          short_description: product.short_description,
+          description: product.description,
+        },
+      };
+
+      const result = await productsCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
+    //update product discount
+
+    app.patch("/product/discount/update/:id", async (req, res) => {
+      const product = req.body;
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          discount: product.discount,
+        },
+      };
+
+      const result = await productsCollection.updateOne(query, updateDoc);
       res.send(result);
     });
 
@@ -189,6 +261,26 @@ async function run() {
       res.send(result);
     });
 
+    app.delete("/carts/items/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await cartCollection.deleteOne(query);
+      res.send(result);
+    });
+
+    app.put("/carts/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const cart = req.body;
+      const updateDoc = {
+        $set: {
+          count: cart.count,
+        },
+      };
+      const result = await cartCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
     //============================================================================//
     //!=================================add to wishlist =======================
 
@@ -202,7 +294,7 @@ async function run() {
       const result = await wishlistCollection.insertOne(product);
       res.send(result);
     });
-r
+
     app.get("/wishlists", async (req, res) => {
       const result = await wishlistCollection.find().toArray();
       res.send(result);
@@ -212,6 +304,13 @@ r
       const email = req.query.email;
       const query = { email: email };
       const result = await wishlistCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.delete("/wishlists/items/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await wishlistCollection.deleteOne(query);
       res.send(result);
     });
 
