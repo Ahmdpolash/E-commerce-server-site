@@ -145,10 +145,8 @@ async function run() {
 
     //get only discount product
 
-    // app.get("/product/:discount", async (req, res) => {
-    //   const discount = req.params.discount;
-    //   const query = { discount: discount };
-    //   console.log(query);
+    // app.get("/products/withDiscount/:email", async (req, res) => {
+    //   const query = { discount: { $ne: 0 } }; // $ne stands for "not equal"
     //   const result = await productsCollection.find(query).toArray();
     //   res.send(result);
     // });
@@ -234,7 +232,16 @@ async function run() {
       res.send(result);
     });
 
-    //================================================================
+    //? ====================================category query=============================
+
+    app.get("/shop", async (req, res) => {
+      const category = req.query.category;
+      const query = { category: category };
+      const result = await productsCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    //============================================================================
 
     //!=================================add to cart =======================
 
