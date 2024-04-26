@@ -135,6 +135,47 @@ async function run() {
 
     //================================================================
 
+    //! product filtering api ===========================
+
+    app.get("/product", async (req, res) => {
+      try {
+        let query = {};
+
+        // Category filter
+        if (req.query.category) {
+          query.category = req.query.category;
+        }
+
+        // Price range filter
+
+        // Review filter
+        if (req.query.minReview) {
+          query.review = { $gte: req.query.minReview };
+        }
+
+        // Sort order
+        let sortOption = {};
+        if (req.query.sort === "lowToHigh") {
+          sortOption.price = 1; // Sort by price in ascending order
+        } else if (req.query.sort === "highToLow") {
+          sortOption.price = -1; // Sort by price in descending order
+        }
+
+        console.log("Query:", query); // Logging query for debugging
+
+        // Fetch products based on filters
+        const productsCursor = await productsCollection.find(query);
+        const products = await productsCursor.toArray();
+
+        res.json(products);
+      } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server Error" });
+      }
+    });
+
+    //===================================================
+
     //! product post and get api ===========================
 
     app.post("/products", async (req, res) => {
