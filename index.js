@@ -13,6 +13,7 @@ app.use(
     origin: [
       "https://myshop-606ef.firebaseapp.com",
       "https://myshop-606ef.web.app",
+      "https://e-commerce-client-navy.vercel.app",
       "http://localhost:5173",
     ],
   })
@@ -141,7 +142,7 @@ async function run() {
       try {
         let query = {};
 
-        // Category filter
+        // Category filter+
         if (req.query.category) {
           query.category = req.query.category;
         }
@@ -153,19 +154,23 @@ async function run() {
           query.review = { $gte: req.query.minReview };
         }
 
+        //search
+        if (req.query.search) {
+          req.product_name = req.query.product_name;
+        }
+
         // Sort order
         let sortOption = {};
         if (req.query.sort === "lowToHigh") {
-          sortOption.price = 1; // Sort by price in ascending order
+          sortOption.price = 1;
         } else if (req.query.sort === "highToLow") {
-          sortOption.price = -1; // Sort by price in descending order
+          sortOption.price = -1;
         }
 
-        console.log("Query:", query); // Logging query for debugging
+        console.log("Query:", query);
 
         // Fetch products based on filters
-        const productsCursor = await productsCollection.find(query);
-        const products = await productsCursor.toArray();
+        const products = await productsCollection.find(query).toArray();
 
         res.json(products);
       } catch (err) {
@@ -326,6 +331,14 @@ async function run() {
         },
       };
       const result = await cartCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
+    // delete all carts by user
+    app.delete("/carts/delete", async (req, res) => {
+      const email = req.query.email;
+
+      const result = await cartCollection.deleteMany({ email: email });
       res.send(result);
     });
 
