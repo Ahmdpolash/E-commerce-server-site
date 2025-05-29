@@ -13,7 +13,7 @@ app.use(
     origin: [
       "https://myshop-606ef.firebaseapp.com",
       "https://myshop-606ef.web.app",
-      "https://e-commerce-client-navy.vercel.app",
+      "https://myshop-two-phi.vercel.app",
       "http://localhost:5173",
     ],
   })
